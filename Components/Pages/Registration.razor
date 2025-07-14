@@ -2,41 +2,52 @@
 @layout EmptyLayout
 @using UsersLogin.Models;
 @using UsersLogin.PanelService;
+@inject NavigationManager navManager
+@rendermode InteractiveServer
 @inject AdminPanelService adminPanelService;
-
 
 <div class="container">
     <h3>Registration</h3>
 
     <form @onsubmit="HandleRegistration">
-        <label>Name :</label>
+        <label>Name:</label>
         <input type="text" @bind="registrationModel.Name" required />
 
-        <label>Email :</label>
+        <label>Email:</label>
         <input type="email" @bind="registrationModel.Email" required />
 
-        <label>Password :</label>
+        <label>Password:</label>
         <input type="password" @bind="registrationModel.Password" required />
 
         <button type="submit">Register</button>
 
-        @if(!string.IsNullOrEmpty(alertMessage))
+        @if (!string.IsNullOrEmpty(alertMessage))
         {
-            <div class="alert"> @alertMessage</div>
+            <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">@alertMessage</div>
         }
-        <p>Already have an account <a href="/login">login</a></p>
-
+        <p>Already have an account? <a href="/login">Login</a></p>
     </form>
 </div>
 
-@code{
+@code {
     private RegistrationModel registrationModel = new();
     private string alertMessage;
+    private bool isSuccess;
+
     private async Task HandleRegistration()
     {
         var RegistrationResponse = await adminPanelService.Register(registrationModel);
         alertMessage = RegistrationResponse.Message;
+        isSuccess = RegistrationResponse.Success;
 
+        if (isSuccess)
+        {
+            // Clear the form
+            registrationModel = new RegistrationModel();
+            // Navigate after a short delay to let user see the success message
+            await Task.Delay(1500);
+            navManager.NavigateTo("/login");  // Redirect to login page after successful registration
+        }
     }
 }
 

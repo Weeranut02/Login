@@ -18,13 +18,14 @@ public class AdminPanelService
 
     public async Task<ResponseModel> Register(RegistrationModel registrationModel)
     {
-        var exisitngAmid = await _context.AdminInfos.FirstOrDefaultAsync(x => x.Email == registrationModel.Email);
-        if (exisitngAmid == null)
+        // Check if email already exists
+        var existingAdmin = await _context.AdminInfos.FirstOrDefaultAsync(x => x.Email == registrationModel.Email);
+        if (existingAdmin != null)
         {
             return new ResponseModel
             {
                 Success = false,
-                Message = "An error occured! Please try Again."
+                Message = "Email already registered. Please use a different email."
             };
         }
 
@@ -32,7 +33,7 @@ public class AdminPanelService
         {
             Name = registrationModel.Name,
             Email = registrationModel.Email,
-            Password = registrationModel.Password
+            Password = registrationModel.Password // Note: In production, you should hash the password
         };
 
         await _context.AdminInfos.AddAsync(dbAdminInfos);
@@ -41,42 +42,51 @@ public class AdminPanelService
         return new ResponseModel
         {
             Success = true,
-            Message = "Registretion successful."
+            Message = "Registration successful."
         };
-    
     }
 
     public async Task<ResponseModel> Login(LoginModel loginModel)
     {
-        var user = await _context.AdminInfos.FirstOrDefaultAsync(x => x.Email == loginModel.EmailId);
-        if (user == null)
+        // Validate input
+        if (loginModel == null || string.IsNullOrEmpty(loginModel.EmailId) || string.IsNullOrEmpty(loginModel.Password))
         {
             return new ResponseModel
             {
                 Success = false,
-                Message = "Email not registered"
+                Message = "Email and password are required"
             };
-
         }
 
+        // Find user by email
+        var user = await _context.AdminInfos.FirstOrDefaultAsync(x => x.Email == loginModel.EmailId);
+        if (user == null)
+        {
+            // Don't reveal whether email exists (security best practice)
+            return new ResponseModel
+            {
+                Success = false,
+                Message = "Invalid credentials"
+            };
+        }
+
+        // Verify password - in production, you should NEVER store or compare plain text passwords
+        // This is just for demonstration - see important security note below
         if (user.Password != loginModel.Password)
         {
             return new ResponseModel
             {
                 Success = false,
-                Message = "Your Password is incorect"
+                Message = "Invalid credentials"
             };
-
         }
+
+        // Successful login
         return new ResponseModel
         {
             Success = true,
             Message = $"{user.Id} {user.Name} {user.Email}"
-
         };
-        
-
-        
     }
 }
 

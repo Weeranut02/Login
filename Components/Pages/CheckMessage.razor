@@ -1,0 +1,54 @@
+@page "/checkmessage"
+@using UsersLogin.Models
+@using UsersLogin.PanelService
+@rendermode InteractiveServer
+@inject AdminPanelService adminPanelService;
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="loginModel.EmailId" class="form-control" />
+        <ValidationMessage For="@(() => loginModel.EmailId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" @bind-Value="loginModel.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => loginModel.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@if (showMessage)
+{
+    <div class="alert @alertClass" style="margin-top: 20px;">
+        @message
+    </div>
+}
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private string message = string.Empty;
+    private string alertClass = string.Empty;
+    private bool showMessage = false;
+
+    private async Task HandleLogin()
+    {
+        var result = await adminPanelService.Login(loginModel);
+        
+        showMessage = true;
+        message = result.Message;
+        alertClass = result.Success ? "alert-success" : "alert-danger";
+
+        // Optional: Clear form on success
+        if (result.Success)
+        {
+            loginModel = new LoginModel();
+        }
+    }
+}

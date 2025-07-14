@@ -21,7 +21,7 @@ namespace UsersLogin.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("UsersLogin.Models.Users", b =>
+            modelBuilder.Entity("UsersLogin.Models.AdminInfos", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,12 +35,12 @@ namespace UsersLogin.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Pasword")
+                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("AdminInfos");
                 });
 #pragma warning restore 612, 618
         }

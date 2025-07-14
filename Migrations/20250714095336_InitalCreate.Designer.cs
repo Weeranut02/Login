@@ -11,8 +11,8 @@ using UsersLogin.Services;
 namespace UsersLogin.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250714040441_UserssCreate")]
-    partial class UserssCreate
+    [Migration("20250714095336_InitalCreate")]
+    partial class InitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace UsersLogin.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("UsersLogin.Models.Users", b =>
+            modelBuilder.Entity("UsersLogin.Models.AdminInfos", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,12 +38,12 @@ namespace UsersLogin.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Pasword")
+                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("AdminInfos");
                 });
 #pragma warning restore 612, 618
         }

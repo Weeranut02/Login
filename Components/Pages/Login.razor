@@ -3,8 +3,10 @@
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using UsersLogin.Models;
 @using UsersLogin.PanelService;
+@rendermode InteractiveServer
 @inject NavigationManager navManager
 @inject AdminPanelService adminPanelService;
+
 
 <div class="container">
     <h3>Login</h3>
@@ -33,18 +35,12 @@
     private async Task HandleLogin()
     {
         var response = await adminPanelService.Login(loginModel);
-        alertMessage = response.Message;
+        @* alertMessage = response.Message; *@
 
-        if (response.Success == true)
-    {
-        navManager.NavigateTo("/home");  // เปลี่ยนหน้าไป /home
+        if (response.Success)
+        {
+            navManager.NavigateTo("/");  // เปลี่ยนหน้าไป /home
+        }
     }
-
-        
-    }
-    
-
-    
-
     
 }
