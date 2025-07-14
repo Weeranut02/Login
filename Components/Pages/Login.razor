@@ -1,0 +1,50 @@
+@page "/login"
+@layout EmptyLayout
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using UsersLogin.Models;
+@using UsersLogin.PanelService;
+@inject NavigationManager navManager
+@inject AdminPanelService adminPanelService;
+
+<div class="container">
+    <h3>Login</h3>
+    <form @onsubmit="HandleLogin">
+        <label>Email :</label>
+        <input type="email" @bind="loginModel.EmailId" required />
+
+        <label>Password :</label>
+        <input type="password" @bind="loginModel.Password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    @if(!string.IsNullOrEmpty(alertMessage))
+    {
+        <div class="alert">@alertMessage</div>
+    }
+
+    <p>Don't have an account? <a href="/register">Register</a></p>
+
+</div>
+
+@code{
+    private LoginModel loginModel = new();
+    private string alertMessage;
+    private async Task HandleLogin()
+    {
+        var response = await adminPanelService.Login(loginModel);
+        alertMessage = response.Message;
+
+        if (response.Success == true)
+    {
+        navManager.NavigateTo("/home");  // เปลี่ยนหน้าไป /home
+    }
+
+        
+    }
+    
+
+    
+
+    
+}

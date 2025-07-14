@@ -1,0 +1,43 @@
+@page "/register"
+@layout EmptyLayout
+@using UsersLogin.Models;
+@using UsersLogin.PanelService;
+@inject AdminPanelService adminPanelService;
+
+
+<div class="container">
+    <h3>Registration</h3>
+
+    <form @onsubmit="HandleRegistration">
+        <label>Name :</label>
+        <input type="text" @bind="registrationModel.Name" required />
+
+        <label>Email :</label>
+        <input type="email" @bind="registrationModel.Email" required />
+
+        <label>Password :</label>
+        <input type="password" @bind="registrationModel.Password" required />
+
+        <button type="submit">Register</button>
+
+        @if(!string.IsNullOrEmpty(alertMessage))
+        {
+            <div class="alert"> @alertMessage</div>
+        }
+        <p>Already have an account <a href="/login">login</a></p>
+
+    </form>
+</div>
+
+@code{
+    private RegistrationModel registrationModel = new();
+    private string alertMessage;
+    private async Task HandleRegistration()
+    {
+        var RegistrationResponse = await adminPanelService.Register(registrationModel);
+        alertMessage = RegistrationResponse.Message;
+
+    }
+}
+
+
