@@ -6,26 +6,37 @@
 @rendermode InteractiveServer
 @inject AdminPanelService adminPanelService;
 
-<div class="container">
-    <h3>Registration</h3>
+<div class="container mt-5" style="max-width: 450px;">
+    <h3 class="text-center mb-4">📝 Register</h3>
 
     <form @onsubmit="HandleRegistration">
-        <label>Name:</label>
-        <input type="text" @bind="registrationModel.Name" required />
+        <div class="form-group mb-3">
+            <label>Name:</label>
+            <input type="text" class="form-control" @bind="registrationModel.Name" required />
+        </div>
 
-        <label>Email:</label>
-        <input type="email" @bind="registrationModel.Email" required />
+        <div class="form-group mb-3">
+            <label>Email:</label>
+            <input type="email" class="form-control" @bind="registrationModel.Email" required />
+        </div>
 
-        <label>Password:</label>
-        <input type="password" @bind="registrationModel.Password" required />
+        <div class="form-group mb-4">
+            <label>Password:</label>
+            <input type="password" class="form-control" @bind="registrationModel.Password" required />
+        </div>
 
-        <button type="submit">Register</button>
+        <button type="submit" class="btn btn-success w-100">Register</button>
 
         @if (!string.IsNullOrEmpty(alertMessage))
         {
-            <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">@alertMessage</div>
+            <div class="alert @(isSuccess ? "alert-success" : "alert-danger") mt-3">
+                @alertMessage
+            </div>
         }
-        <p>Already have an account? <a href="/login">Login</a></p>
+
+        <p class="mt-4 text-center">
+            Already have an account? <a href="/login">Login</a>
+        </p>
     </form>
 </div>
 
@@ -42,13 +53,9 @@
 
         if (isSuccess)
         {
-            // Clear the form
-            registrationModel = new RegistrationModel();
-            // Navigate after a short delay to let user see the success message
-            await Task.Delay(1500);
-            navManager.NavigateTo("/login");  // Redirect to login page after successful registration
+            registrationModel = new RegistrationModel(); // Clear form
+            await Task.Delay(1500); // Wait before redirect
+            navManager.NavigateTo("/login");
         }
     }
 }
-
-

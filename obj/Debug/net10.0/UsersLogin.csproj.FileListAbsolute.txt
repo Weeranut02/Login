@@ -413,3 +413,4 @@ D:\Login\obj\Debug\net10.0\refint\UsersLogin.dll
 D:\Login\obj\Debug\net10.0\UsersLogin.pdb
 D:\Login\obj\Debug\net10.0\UsersLogin.genruntimeconfig.cache
 D:\Login\obj\Debug\net10.0\ref\UsersLogin.dll
+D:\UsersLogin\obj\Debug\net10.0\UsersLogin.sourcelink.json

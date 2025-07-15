@@ -1,0 +1,66 @@
+@page "/adminlist"
+@inject ApplicationDbContext db
+@using Microsoft.EntityFrameworkCore
+@using UsersLogin.Models
+@using UsersLogin.Services
+
+<div class="container mt-5" style="max-width: 900px;">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">📋 รายชื่อแอดมิน</h3>
+        </div>
+        <div class="card-body">
+
+            @if (adminList == null)
+            {
+                <div class="text-center py-3">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">กำลังโหลดข้อมูล...</p>
+                </div>
+            }
+            else if (!adminList.Any())
+            {
+                <div class="alert alert-warning text-center">
+                    ไม่พบข้อมูลแอดมินในระบบ
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">ลำดับ</th>
+                                <th scope="col">ชื่อ</th>
+                                <th scope="col">อีเมล</th>
+                                <th scope="col">รหัสผ่าน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var admin in adminList)
+                            {
+                                <tr>
+                                    <td>@admin.Id</td>
+                                    <td>@admin.Name</td>
+                                    <td>@admin.Email</td>
+                                    <td>@admin.Password</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<AdminInfos> adminList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        adminList = await db.AdminInfos.ToListAsync();
+    }
+}

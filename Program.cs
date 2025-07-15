@@ -9,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5229/") }); // เป็นการเชื่อมหน้าบ้านหลังบ้าน
+
+builder.Services.AddHttpClient("BackEndGame", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5229/");
+});
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

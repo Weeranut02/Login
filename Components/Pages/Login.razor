@@ -7,40 +7,46 @@
 @inject NavigationManager navManager
 @inject AdminPanelService adminPanelService;
 
+<div class="container mt-5" style="max-width: 400px;">
+    <h3 class="text-center mb-4">🔐 Login</h3>
 
-<div class="container">
-    <h3>Login</h3>
     <form @onsubmit="HandleLogin">
-        <label>Email :</label>
-        <input type="email" @bind="loginModel.EmailId" required />
+        <div class="form-group mb-3">
+            <label>Email :</label>
+            <input type="email" class="form-control" @bind="loginModel.EmailId" required />
+        </div>
 
-        <label>Password :</label>
-        <input type="password" @bind="loginModel.Password" required>
+        <div class="form-group mb-3">
+            <label>Password :</label>
+            <input type="password" class="form-control" @bind="loginModel.Password" required />
+        </div>
 
-        <button type="submit">Login</button>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
 
-    @if(!string.IsNullOrEmpty(alertMessage))
+    @if (!string.IsNullOrEmpty(alertMessage))
     {
-        <div class="alert">@alertMessage</div>
+        <div class="alert alert-warning mt-3">@alertMessage</div>
     }
 
-    <p>Don't have an account? <a href="/register">Register</a></p>
-
+    <p class="mt-4 text-center">Don't have an account? <a href="/register">Register</a></p>
 </div>
 
-@code{
+@code {
     private LoginModel loginModel = new();
     private string alertMessage;
+
     private async Task HandleLogin()
     {
         var response = await adminPanelService.Login(loginModel);
-        @* alertMessage = response.Message; *@
 
         if (response.Success)
         {
-            navManager.NavigateTo("/");  // เปลี่ยนหน้าไป /home
+            navManager.NavigateTo("/");  // เปลี่ยนหน้าไป /
+        }
+        else
+        {
+            alertMessage = response.Message ?? "Login failed. Please try again.";
         }
     }
-    
 }

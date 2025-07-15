@@ -1,0 +1,210 @@
+@page "/getgames"
+@using Microsoft.JSInterop
+@using UsersLogin.Models
+@inject HttpClient _http
+@inject IJSRuntime JS
+@inject NavigationManager nav
+
+@rendermode InteractiveServer
+
+
+
+<PageTitle>Games List</PageTitle>
+
+<h3 class="text-center mb-4">📋 รายการเกม</h3>
+
+<div class="mb-3 text-end">
+    <button class="btn btn-success mb-3" @onclick="GoToPostgame">+ เพิ่มเกมใหม่</button>
+    
+</div>
+
+<!-- ตารางแสดงข้อมูลเกม -->
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>รหัส</th>
+                <th>ชื่อเกม</th>
+                <th>แพลตฟอร์ม</th>
+                <th>ผู้พัฒนา</th>
+                <th>ผู้จัดจำหน่าย</th>
+                <th>วันที่สั่งซื้อ</th>
+                <th>วันที่สร้าง</th>
+                <th>จัดการเกม</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (games != null && games.Count > 0)
+            {
+                @foreach (var g in games)
+                {
+                    <tr>
+                        <td class="text-center">@g.Id</td>
+                        <td>@g.Title</td>
+                        <td>@g.Platform</td>
+                        <td>@g.Developer</td>
+                        <td>@g.Publisher</td>
+                        <td>@(g.OrderDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>@g.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning me-1" @onclick="() => ShowModalEdit(g.Id)">แก้ไข</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(g.Id)">ลบ</button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="8" class="text-center">ไม่พบข้อมูลเกม</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal เพิ่มเกม -->
+@if (showModal)
+{
+    <div class="modal show d-block" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">เพิ่มเกมใหม่</h5>
+                    <button type="button" class="btn-close" @onclick="HideModal"></button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control mb-2" @bind="gameDto.Title" placeholder="ชื่อเกม" />
+                    <input class="form-control mb-2" @bind="gameDto.Platform" placeholder="แพลตฟอร์ม" />
+                    <input class="form-control mb-2" @bind="gameDto.Developer" placeholder="ผู้พัฒนา" />
+                    <input class="form-control mb-2" @bind="gameDto.Publisher" placeholder="ผู้จัดจำหน่าย" />
+                    <input class="form-control mb-2" type="date" @bind="gameDto.OrderDate" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="Add">บันทึก</button>
+                    <button class="btn btn-secondary" @onclick="HideModal">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal แก้ไขเกม -->
+@if (showModalEdit)
+{
+    <div class="modal show d-block" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">แก้ไขข้อมูลเกม</h5>
+                    <button type="button" class="btn-close" @onclick="HideModalEdit"></button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control mb-2" @bind="gameEditDto.Title" placeholder="ชื่อเกม" />
+                    <input class="form-control mb-2" @bind="gameEditDto.Platform" placeholder="แพลตฟอร์ม" />
+                    <input class="form-control mb-2" @bind="gameEditDto.Developer" placeholder="ผู้พัฒนา" />
+                    <input class="form-control mb-2" @bind="gameEditDto.Publisher" placeholder="ผู้จัดจำหน่าย" />
+                    <input class="form-control mb-2" type="date" @bind="gameEditDto.OrderDate" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="Update">บันทึก</button>
+                    <button class="btn btn-secondary" @onclick="HideModalEdit">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<GamesDto>? games = new();
+    private GamesDto gameDto { get; set; } = new();
+    private GamesDto gameEditDto { get; set; } = new();
+    private bool showModal = false;
+    private bool showModalEdit = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        games = await _http.GetFromJsonAsync<List<GamesDto>>("api/games");
+    }
+
+    private void ShowModal()
+    {
+        gameDto = new();
+        showModal = true;
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+    }
+
+    private async Task Add()
+    {
+        gameDto.CreatedAt = DateTime.Now;
+        var response = await _http.PostAsJsonAsync("api/games", gameDto);
+        if (response.IsSuccessStatusCode)
+        {
+            HideModal();
+            await LoadData();
+        }
+    }
+
+    private async Task ShowModalEdit(int id)
+    {
+        gameEditDto = await _http.GetFromJsonAsync<GamesDto>($"api/games/{id}");
+        showModalEdit = true;
+    }
+
+    private void HideModalEdit()
+    {
+        showModalEdit = false;
+    }
+
+    private async Task Update()
+    {
+        var response = await _http.PutAsJsonAsync($"api/games/{gameEditDto.Id}", gameEditDto);
+        if (response.IsSuccessStatusCode)
+        {
+            HideModalEdit();
+            await LoadData();
+        }
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "คุณแน่ใจหรือไม่ว่าต้องการลบ?");
+        if (confirmed)
+        {
+            await Delete(id);
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var response = await _http.DeleteAsync($"api/games/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadData();
+        }
+    }
+
+    @* private void GoToPostgame()
+    {
+        try
+        {
+            Console.WriteLine("กำลังไปหน้า /postgame");
+            nav.NavigateTo("/postgame", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error navigating to /postgame: {ex.Message}");
+        }
+    } *@
+    private void GoToPostgame()
+    {
+        nav.NavigateTo("/postgame");
+    }
+}
